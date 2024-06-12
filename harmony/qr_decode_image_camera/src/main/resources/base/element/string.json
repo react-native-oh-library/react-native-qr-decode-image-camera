@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "Qr_decode_image_cameraAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "Qr_decode_image_cameraAbility_label",
+      "value": "label"
+    }
+  ]
+}

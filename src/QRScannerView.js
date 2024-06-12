@@ -261,7 +261,8 @@ export default class QRScannerView extends Component {
             top: 0,
             width: this.state.topWidth
           }
-        ]}/>
+        ]
+        }/>
 
         <View
           style={[
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    left: 0
+    left: 0,
   },
   viewfinder: {
     alignItems: 'center',

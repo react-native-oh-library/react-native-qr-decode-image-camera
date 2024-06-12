@@ -6,15 +6,12 @@ import {
   StyleSheet,
   View,
   Text,
-  Image,
   Vibration,
   Platform,
-  PixelRatio,
-  StatusBar
 } from "react-native";
-
+import NativeScan from "react-native-qr-decode-image-camera/src/NativeScan";
 import QRScannerView from "./QRScannerView";
-const pixelRatio = PixelRatio.get();
+
 
 /**
  * Scan interface
@@ -29,8 +26,8 @@ export default class QRScanner extends PureComponent {
   }
 
   static defaultProps = {
-    onRead: () => {},
-    renderTopView: () => {},
+    onRead: () => { },
+    renderTopView: () => { },
     renderBottomView: () => (
       <View style={{ flex: 1, backgroundColor: "#0000004D" }} />
     ),
@@ -52,30 +49,18 @@ export default class QRScanner extends PureComponent {
   };
 
   render() {
-    return (
-      <View
+    if (Platform.OS == 'harmony') {
+      return (
+        <View
         style={{
-          flex: 1
+          flex: 1,
         }}
       >
-        <RNCamera
-          style={{
-            flex: 1
-          }}
-          captureAudio={false}
-          onBarCodeRead={this._handleBarCodeRead}
-          androidCameraPermissionOptions={null}
-          androidRecordAudioPermissionOptions={null}
-          notAuthorizedView={this.props.notAuthorizedView()}
-          barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-          flashMode={
-            !this.props.flashMode
-              ? RNCamera.Constants.FlashMode.off
-              : RNCamera.Constants.FlashMode.torch
-          }
-          zoom={this.props.zoom}
-          type={this.props.cameraType}
-        >
+        <NativeScan
+        onRead={this.props.onRead}
+        flashMode={this.props.flashMode}
+        zoom={this.props.zoom}
+        />
           <View style={[styles.topButtonsContainer, this.props.topViewStyle]}>
             {this.props.renderTopView()}
           </View>
@@ -109,9 +94,72 @@ export default class QRScanner extends PureComponent {
           >
             {this.props.renderBottomView()}
           </View>
-        </RNCamera>
+       
       </View>
-    );
+      )
+    } else {
+      return (
+        <View
+          style={{
+            flex: 1
+          }}
+        >
+          <RNCamera
+            style={{
+              flex: 1
+            }}
+            captureAudio={false}
+            onBarCodeRead={this._handleBarCodeRead}
+            androidCameraPermissionOptions={null}
+            androidRecordAudioPermissionOptions={null}
+            notAuthorizedView={this.props.notAuthorizedView()}
+            barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+            flashMode={
+              !this.props.flashMode
+                ? RNCamera.Constants.FlashMode.off
+                : RNCamera.Constants.FlashMode.torch
+            }
+            zoom={this.props.zoom}
+            type={this.props.cameraType}
+          >
+            <View style={[styles.topButtonsContainer, this.props.topViewStyle]}>
+              {this.props.renderTopView()}
+            </View>
+            <QRScannerView
+              maskColor={this.props.maskColor}
+              cornerColor={this.props.cornerColor}
+              borderColor={this.props.borderColor}
+              rectHeight={this.props.rectHeight}
+              rectWidth={this.props.rectWidth}
+              borderWidth={this.props.borderWidth}
+              cornerBorderWidth={this.props.cornerBorderWidth}
+              cornerBorderLength={this.props.cornerBorderLength}
+              cornerOffsetSize={this.props.cornerOffsetSize}
+              isCornerOffset={this.props.isCornerOffset}
+              bottomHeight={this.props.bottomHeight}
+              scanBarAnimateTime={this.props.scanBarAnimateTime}
+              scanBarColor={this.props.scanBarColor}
+              scanBarHeight={this.props.scanBarHeight}
+              scanBarMargin={this.props.scanBarMargin}
+              hintText={this.props.hintText}
+              hintTextStyle={this.props.hintTextStyle}
+              scanBarImage={this.props.scanBarImage}
+              hintTextPosition={this.props.hintTextPosition}
+              isShowScanBar={this.props.isShowScanBar}
+              finderX={this.props.finderX}
+              finderY={this.props.finderY}
+              returnSize={this.barCodeSize}
+            />
+            <View
+              style={[styles.bottomButtonsContainer, this.props.bottomViewStyle]}
+            >
+              {this.props.renderBottomView()}
+            </View>
+          </RNCamera>
+        </View>
+      );
+    }
+
   }
 
   isShowCode = false;
@@ -200,16 +248,24 @@ export default class QRScanner extends PureComponent {
   };
 
   _handleBarCodeRead = e => {
-    switch (Platform.OS) {
-      case "ios":
-        this.iosBarCode(e);
-        break;
-      case "android":
-        this.androidBarCode(e);
-        break;
-      default:
-        break;
+    if (Platform.OS === 'ios') {
+      this.iosBarCode(e);
+    } else if (Platform.OS === 'android') {
+      this.androidBarCode(e);
+    } else {
+      console.log("click", "ios和安卓都没走")
     }
+
+    // switch (Platform.OS) {
+    //   case "ios":
+    //     this.iosBarCode(e);
+    //     break;
+    //   case "android":
+    //     this.androidBarCode(e);
+    //     break;
+    //   default:
+    //     break;
+    // }
   };
 }
 

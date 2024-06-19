@@ -9,7 +9,7 @@ import {
   Vibration,
   Platform,
 } from "react-native";
-import NativeScan from "react-native-qr-decode-image-camera/src/NativeScan";
+import NativeScan from "./NativeScan";
 import QRScannerView from "./QRScannerView";
 
 

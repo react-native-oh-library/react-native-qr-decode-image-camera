@@ -5,7 +5,7 @@ var getQr =TurboModuleRegistry ?
 TurboModuleRegistry.get('QrDecodeImageCameraNativeModule') : NativeModules.QRScanReader;
 const QRreader = (fileUrl)=>{
   if (Platform.OS == 'harmony') {
-    return  getQr.QRreader()
+    return  getQr.QRreader(fileUrl)
    }else{
   var QRScanReader = NativeModules.QRScanReader;
   return QRScanReader.readerQR(fileUrl);      

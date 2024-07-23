@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, Component } from "react";
 import { RNCamera } from "react-native-camera";
 import PropTypes from "prop-types";
 
@@ -9,14 +9,15 @@ import {
   Vibration,
   Platform,
 } from "react-native";
-import NativeScan from "./NativeScan";
 import QRScannerView from "./QRScannerView";
-
-
+import QRScannerHarmony from "./QRScanner.harmony.jsx"
 /**
  * Scan interface
  */
-export default class QRScanner extends PureComponent {
+
+
+export default class QRScanner extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -51,51 +52,7 @@ export default class QRScanner extends PureComponent {
   render() {
     if (Platform.OS == 'harmony') {
       return (
-        <View
-        style={{
-          flex: 1,
-        }}
-      >
-        <NativeScan
-        onRead={this.props.onRead}
-        flashMode={this.props.flashMode}
-        zoom={this.props.zoom}
-        />
-          <View style={[styles.topButtonsContainer, this.props.topViewStyle]}>
-            {this.props.renderTopView()}
-          </View>
-          <QRScannerView
-            maskColor={this.props.maskColor}
-            cornerColor={this.props.cornerColor}
-            borderColor={this.props.borderColor}
-            rectHeight={this.props.rectHeight}
-            rectWidth={this.props.rectWidth}
-            borderWidth={this.props.borderWidth}
-            cornerBorderWidth={this.props.cornerBorderWidth}
-            cornerBorderLength={this.props.cornerBorderLength}
-            cornerOffsetSize={this.props.cornerOffsetSize}
-            isCornerOffset={this.props.isCornerOffset}
-            bottomHeight={this.props.bottomHeight}
-            scanBarAnimateTime={this.props.scanBarAnimateTime}
-            scanBarColor={this.props.scanBarColor}
-            scanBarHeight={this.props.scanBarHeight}
-            scanBarMargin={this.props.scanBarMargin}
-            hintText={this.props.hintText}
-            hintTextStyle={this.props.hintTextStyle}
-            scanBarImage={this.props.scanBarImage}
-            hintTextPosition={this.props.hintTextPosition}
-            isShowScanBar={this.props.isShowScanBar}
-            finderX={this.props.finderX}
-            finderY={this.props.finderY}
-            returnSize={this.barCodeSize}
-          />
-          <View
-            style={[styles.bottomButtonsContainer, this.props.bottomViewStyle]}
-          >
-            {this.props.renderBottomView()}
-          </View>
-       
-      </View>
+        <QRScannerHarmony {...this.props} />
       )
     } else {
       return (
@@ -248,24 +205,16 @@ export default class QRScanner extends PureComponent {
   };
 
   _handleBarCodeRead = e => {
-    if (Platform.OS === 'ios') {
-      this.iosBarCode(e);
-    } else if (Platform.OS === 'android') {
-      this.androidBarCode(e);
-    } else {
-      console.log("click", "ios和安卓都没走")
+    switch (Platform.OS) {
+      case "ios":
+        this.iosBarCode(e);
+        break;
+      case "android":
+        this.androidBarCode(e);
+        break;
+      default:
+        break;
     }
-
-    // switch (Platform.OS) {
-    //   case "ios":
-    //     this.iosBarCode(e);
-    //     break;
-    //   case "android":
-    //     this.androidBarCode(e);
-    //     break;
-    //   default:
-    //     break;
-    // }
   };
 }
 

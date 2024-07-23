@@ -169,7 +169,8 @@ export default class QRScannerView extends Component {
       return <Image
         style={{
         resizeMode: 'contain',
-        width: this.getScanImageWidth()
+        width: this.getScanImageWidth(),
+        height:this.props.scanBarHeight
       }}
         source={this.props.scanBarImage}/>
     } else {

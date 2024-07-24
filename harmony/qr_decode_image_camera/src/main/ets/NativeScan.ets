@@ -1,13 +1,10 @@
-import { RNOHContext, RNViewBase ,ViewBaseProps,Descriptor} from '@rnoh/react-native-openharmony';
+import { RNOHContext ,ViewBaseProps,Descriptor} from '@rnoh/react-native-openharmony';
 import { RNC } from "@rnoh/react-native-openharmony/generated";
 import { scanCore, scanBarcode, customScan } from '@kit.ScanKit';
-// 导入功能涉及的权限申请、回调接口
-import { router, promptAction, display } from '@kit.ArkUI';
-import { AsyncCallback, BusinessError } from '@kit.BasicServicesKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import {  BusinessError } from '@kit.BasicServicesKit';
 import { common, abilityAccessCtrl } from '@kit.AbilityKit';
 import { JSON } from '@kit.ArkTS';
-
+import  Logger  from "./Logger"
 interface NativeScanProps extends ViewBaseProps {
   text: string,
   flashMode: boolean,
@@ -25,9 +22,9 @@ export type  NativeScanDescriptor = Descriptor<"NativeScan", NativeScanProps>
   @State surfaceId: string = ''
   @State isFlashLightEnable: boolean = false
   // 设置预览流高度，默认单位：vp
-  @State cameraHeight: number = 640
+  @State cameraHeight: number = 200
   // 设置预览流宽度，默认单位：vp
-  @State cameraWidth: number = 360
+  @State cameraWidth: number = 200
 
 
   private mXComponentController: XComponentController = new XComponentController()
@@ -38,27 +35,14 @@ export type  NativeScanDescriptor = Descriptor<"NativeScan", NativeScanProps>
     if (result.length > 0) {
       // 获取到扫描结果后暂停相机流
       customScan.stop().then(() => {
-        hilog.info(0x0001, this.TAG, 'Succeeded in stopping customScan by promise!');
+        Logger.info( this.TAG, 'Succeeded in stopping customScan by promise!');
       }).catch((error: BusinessError) => {
-        hilog.error(0x0001, this.TAG, `Failed to stop customScan by promise. Code: ${error.code}, message: ${error.message}`);
+        Logger.error( this.TAG, `Failed to stop customScan by promise. Code: ${error.code}, message: ${error.message}`);
       })
-
       this.onRead(JSON.stringify(result)) //返回结果
-
-
-
-
-      try {
-        customScan.release().then(() => {
-         console.log('[Scan Sample]', 'release success!','click');
-        }).catch((error: BusinessError) => {
-          console.log( '[Scan Sample]', 'release failed business error: %{public}s', JSON.stringify(error),'click');
-        });
-      } catch (error) {
-        console.log( '[Scan Sample]', 'release failed error: %{public}s', JSON.stringify(error),'click');
-      }
     }
   }
+
   changeProps(){
     //监听闪光灯
     if(this.descriptor.props.flashMode === true){
@@ -66,10 +50,9 @@ export type  NativeScanDescriptor = Descriptor<"NativeScan", NativeScanProps>
     }else if (this.descriptor.props.flashMode === false){
       customScan.closeFlashLight();
     }
-
   }
+
   async reqPermissionsFromUser(): Promise<number[]> {
-    hilog.info(0x0001, this.TAG, 'reqPermissionsFromUser start');
     let context = getContext() as common.UIAbilityContext;
     let atManager = abilityAccessCtrl.createAtManager();
     let grantStatus = await atManager.requestPermissionsFromUser(context, ['ohos.permission.CAMERA']);
@@ -85,7 +68,7 @@ export type  NativeScanDescriptor = Descriptor<"NativeScan", NativeScanProps>
         this.userGrant = true;
 
       }else{
-        console.log('permissions fail')
+        Logger.info('permissions fail')
       }
     }
   }
@@ -97,10 +80,10 @@ export type  NativeScanDescriptor = Descriptor<"NativeScan", NativeScanProps>
 
 
   build() {
-    Stack() {
+
      if(this.userGrant){
        XComponent({
-         id: 'componentId',
+         id: 'component-nativeScan',
          type: 'surface',
          controller: this.mXComponentController
        })
@@ -122,25 +105,18 @@ export type  NativeScanDescriptor = Descriptor<"NativeScan", NativeScanProps>
              surfaceId: surfaceId
            };
            customScan.start(viewControl).then((scanResult: Array<scanBarcode.ScanResult>) => {
-             console.log( '[Scan Sample]', `start succeeded, ${JSON.stringify(scanResult)}`,'click');
+             console.log("click``````````")
+             Logger.info( '[Scan Sample]', `start succeeded, ${JSON.stringify(scanResult)}`,'click');
              this.showScanResult(scanResult);
            }).catch((error: BusinessError) => {
-             console.log( '[Scan Sample]', `start failed, code: ${error.code}, message: ${error.message}`,'click');
+             Logger.info( '[Scan Sample]', `start failed, code: ${error.code}, message: ${error.message}`,'click');
            });
            if(this.descriptor.props.zoom){
              customScan.setZoom(this.descriptor.props.zoom)
            }
          })
-           // 预览流宽、高，默认单位vp，支持px、lpx、vp
-         .height('100%')
-         .width('100%')
-         .position({ x: 0, y: 0 })
      }
-    }
-    .alignContent(Alignment.Bottom)
-    .height('100%')
-    .width('100%')
-    .position({ x: 0, y: 0 })
+
   }
   aboutToAppear() {
     this.requestCameraPermission();

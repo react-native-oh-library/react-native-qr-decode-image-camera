@@ -24,7 +24,8 @@
     "harmony"
   ],
   "dependencies": {
-    "prop-types": "^15.8.1"
+    "prop-types": "^15.8.1",
+    "react-native-qr-decode-image-camera":"^1.1.3"
   },
   "homepage": "https://github.com/deepanrajkumar/react-native-qr-decode-image-camera#readme",
   "repository": {

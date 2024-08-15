@@ -6,6 +6,7 @@ import {
   View,
   Text,
   Vibration,
+  PixelRatio
 } from "react-native";
 import QRScannerView from "./QRScannerView";
 import { ComponentCamera } from "./Camera";
@@ -17,7 +18,8 @@ export default class QRScannerHarmony extends Component {
     super(props);
     this.state = {
       scanning: false,
-      barCodeSize: {}
+      barCodeSize: {},
+      isActive:true
     };
   }
 
@@ -46,54 +48,56 @@ export default class QRScannerHarmony extends Component {
 
   render() {
 
-      return (
-        <View
+    return (
+      <View
         style={{
           flex: 1
         }}
       >
         <ComponentCamera
-        zoom={this.props.zoom}
-        torch={this.props.flashMode}
-        onRead={this._handleBarCodeRead}
+          isRepeatScan={this.props.isRepeatScan}
+          zoom={this.props.zoom}
+          torch={this.props.flashMode}
+          onRead={this._handleBarCodeRead}
+          isActive={this.state.isActive}
         />
-          <View style={[styles.topButtonsContainer, this.props.topViewStyle]}>
-            {this.props.renderTopView()}
-          </View>
-          <QRScannerView
-            maskColor={this.props.maskColor}
-            cornerColor={this.props.cornerColor}
-            borderColor={this.props.borderColor}
-            rectHeight={this.props.rectHeight}
-            rectWidth={this.props.rectWidth}
-            borderWidth={this.props.borderWidth}
-            cornerBorderWidth={this.props.cornerBorderWidth}
-            cornerBorderLength={this.props.cornerBorderLength}
-            cornerOffsetSize={this.props.cornerOffsetSize}
-            isCornerOffset={this.props.isCornerOffset}
-            bottomHeight={this.props.bottomHeight}
-            scanBarAnimateTime={this.props.scanBarAnimateTime}
-            scanBarColor={this.props.scanBarColor}
-            scanBarHeight={this.props.scanBarHeight}
-            scanBarMargin={this.props.scanBarMargin}
-            hintText={this.props.hintText}
-            hintTextStyle={this.props.hintTextStyle}
-            scanBarImage={this.props.scanBarImage}
-            hintTextPosition={this.props.hintTextPosition}
-            isShowScanBar={this.props.isShowScanBar}
-            finderX={this.props.finderX}
-            finderY={this.props.finderY}
-            returnSize={this.barCodeSize}
-          />
-          <View
-            style={[styles.bottomButtonsContainer, this.props.bottomViewStyle]}
-          >
-            {this.props.renderBottomView()}
-          </View>
-       
+        <View style={[styles.topButtonsContainer, this.props.topViewStyle]}>
+          {this.props.renderTopView()}
+        </View>
+        <QRScannerView
+          maskColor={this.props.maskColor}
+          cornerColor={this.props.cornerColor}
+          borderColor={this.props.borderColor}
+          rectHeight={this.props.rectHeight}
+          rectWidth={this.props.rectWidth}
+          borderWidth={this.props.borderWidth}
+          cornerBorderWidth={this.props.cornerBorderWidth}
+          cornerBorderLength={this.props.cornerBorderLength}
+          cornerOffsetSize={this.props.cornerOffsetSize}
+          isCornerOffset={this.props.isCornerOffset}
+          bottomHeight={this.props.bottomHeight}
+          scanBarAnimateTime={this.props.scanBarAnimateTime}
+          scanBarColor={this.props.scanBarColor}
+          scanBarHeight={this.props.scanBarHeight}
+          scanBarMargin={this.props.scanBarMargin}
+          hintText={this.props.hintText}
+          hintTextStyle={this.props.hintTextStyle}
+          scanBarImage={this.props.scanBarImage}
+          hintTextPosition={this.props.hintTextPosition}
+          isShowScanBar={this.props.isShowScanBar}
+          finderX={this.props.finderX}
+          finderY={this.props.finderY}
+          returnSize={this.barCodeSize}
+        />
+        <View
+          style={[styles.bottomButtonsContainer, this.props.bottomViewStyle]}
+        >
+          {this.props.renderBottomView()}
+        </View>
+
       </View>
-      )
-  
+    )
+
   }
 
   isShowCode = false;
@@ -106,22 +110,40 @@ export default class QRScannerHarmony extends Component {
 
 
   harmonyBarCode(e) {
-  
+    const { x, y, width, height } = this.state.barCodeSize;
+    const xInPx = PixelRatio.getPixelSizeForLayoutSize(x);
+    const yInPx = PixelRatio.getPixelSizeForLayoutSize(y);
+    const widthInPx = PixelRatio.getPixelSizeForLayoutSize(width);
+    const heightInPx = PixelRatio.getPixelSizeForLayoutSize(height);
+    const findXInPx = PixelRatio.getPixelSizeForLayoutSize(this.props.finderX);
+    const findYInPx = PixelRatio.getPixelSizeForLayoutSize(this.props.finderY);
+    let x_px = Number(e.frame.x);
+    let y_px = Number(e.frame.y);
+    let width_px = e.frame.width;
+    let height_px = e.frame.height;
+    let viewMinX = Number(xInPx - findXInPx);
+    let viewMinY = yInPx - findYInPx;
+    let viewMaxX = xInPx + widthInPx - width_px - findXInPx;
+    let viewMaxY = yInPx + heightInPx - height_px - findYInPx;
+    if (x_px > viewMinX && y_px > viewMinY && x_px < viewMaxX && y_px < viewMaxY) {
     if (this.props.isRepeatScan) {
+      this.setState({ isActive: true});
       Vibration.vibrate();
       this.props.onRead(e);
     } else {
       if (!this.isShowCode) {
         this.isShowCode = true;
+        this.setState({ isActive: false});
         Vibration.vibrate();
         this.props.onRead(e);
       }
-    }         
-      }
-   
+    }
+    }
+  }
+
 
   _handleBarCodeRead = e => {
-     this.harmonyBarCode(e);
+    this.harmonyBarCode(e);
   };
 }
 

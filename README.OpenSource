@@ -1,0 +1,11 @@
+[
+    {
+        "Name": "react-native-qr-decode-image-camera",
+        "License": "MIT License",
+        "License File": "https://github.com/deepanrajkumar/react-native-qr-decode-image-camera/blob/master/LICENSE",
+        "Version Number": "1.1.3-0.0.4",
+        "Owner" : "xiafeng@huawei.com",
+        "Upstream URL": "https://github.com/react-native-oh-library/react-native-qr-decode-image-camera",
+        "Description": "Decode react native from gallery and camera"
+    }
+]

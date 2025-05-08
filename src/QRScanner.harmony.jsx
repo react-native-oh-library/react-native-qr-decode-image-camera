@@ -25,7 +25,7 @@ export default class QRScannerHarmony extends Component {
     this.state = {
       scanning: false,
       barCodeSize: {},
-      isActive:true
+      isActive: true
     };
   }
 
@@ -113,7 +113,8 @@ export default class QRScannerHarmony extends Component {
   returnMax = (a, b) => (a > b ? a : b);
 
   returnMin = (a, b) => (a < b ? a : b);
-
+  oldValue = null;
+  newValue = null;
 
   harmonyBarCode(e) {
     const { x, y, width, height } = this.state.barCodeSize;
@@ -132,18 +133,26 @@ export default class QRScannerHarmony extends Component {
     let viewMaxX = xInPx + widthInPx - width_px - findXInPx;
     let viewMaxY = yInPx + heightInPx - height_px - findYInPx;
     if (x_px > viewMinX && y_px > viewMinY && x_px < viewMaxX && y_px < viewMaxY) {
-    if (this.props.isRepeatScan) {
-      this.setState({ isActive: true});
-      Vibration.vibrate();
-      this.props.onRead(e);
-    } else {
-      if (!this.isShowCode) {
-        this.isShowCode = true;
-        this.setState({ isActive: false});
-        Vibration.vibrate();
-        this.props.onRead(e);
+      this.newValue = e.value;
+      if (this.props.isRepeatScan) {
+        if (this.newValue !== this.oldValue) {
+          this.oldValue = this.newValue;
+          this.setState({ isActive: true });
+          Vibration.vibrate();
+          this.props.onRead(e);
+        }
+        return
+      } else {
+        if (!this.isShowCode) {
+          this.isShowCode = true;
+          this.setState({ isActive: false });
+          Vibration.vibrate();
+          this.props.onRead(e);
+        }
       }
-    }
+    } else {
+      this.newValue = null;
+      this.oldValue = null;
     }
   }
 
